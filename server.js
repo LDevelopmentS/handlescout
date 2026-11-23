@@ -1,7 +1,11 @@
+// HandleScout server: node server.js  (Node 18+, no dependencies)
+// Serves index.html and /api/scan?u=<handle>, which checks each site and streams results as NDJSON.
 const http = require('http'), fs = require('fs'), path = require('path');
 const PORT = process.env.PORT || 3000, HOST = process.env.HOST || '127.0.0.1';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36';
 
+// [name, profile URL, options]  unk = site blocks bots/shows a login wall, never claim found/free
+// miss = regex that appears on a 200 "no such user" page
 const SITES = [
   ['Instagram','https://www.instagram.com/{u}/',{unk:1}],
   ['Threads','https://www.threads.net/@{u}',{unk:1}],
