@@ -29,7 +29,7 @@ h3{margin:0 0 4px;font-size:13px}.var{display:inline-block;margin:4px 4px 0 0;pa
   <input id="u" placeholder="Enter a username" autocomplete="off" autocapitalize="off" spellcheck="false">
   <button class="btn" id="go">Search</button></div>
  <div class="card" id="vbox" hidden><h3>Try a variation:</h3><div id="vars"></div></div>
- <div class="card"><h3>Privacy</h3><div class="s" style="white-space:normal">Searches run on your own HandleScout server and are not stored. Only public profile pages are read.</div></div>
+ <div class="card"><h3>Privacy</h3><div class="s" style="white-space:normal">Searches run on your own server and are not stored. Only public profile pages are read.</div></div>
 </aside></div>
 <script>
 const $=id=>document.getElementById(id);
@@ -62,13 +62,10 @@ async function scan(h){
   const vs=variations(h);$('vbox').hidden=!vs.length;
   $('vars').innerHTML=vs.map(v=>`<span class="var" data-v="${esc(v)}">${esc(v)}</span>`).join('');
   try{
-    const res=await fetch('/api/scan?u='+encodeURIComponent(h));
-    const rd=res.body.getReader(),dec=new TextDecoder();let buf='';
-    for(;;){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});
-      const lines=buf.split('\n');buf=lines.pop();
-      for(const ln of lines)if(ln.trim()){results.push(JSON.parse(ln));render(false)}}
-    render(true);
-  }catch(e){$('out').innerHTML='<div class="empty">Could not reach the HandleScout server. Run <code>node server.js</code> and open http://127.0.0.1:3000</div>'}
+    const res=await fetch('api.php?u='+encodeURIComponent(h));
+    if(!res.ok)throw 0;
+    results=await res.json();render(true);
+  }catch(e){$('out').innerHTML='<div class="empty">Could not reach api.php. Make sure api.php is uploaded in the same folder as index.html.</div>'}
 }
 $('go').onclick=()=>scan($('u').value);
 $('u').addEventListener('keydown',e=>{if(e.key==='Enter')scan($('u').value)});
